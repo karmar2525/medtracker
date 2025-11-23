@@ -11,6 +11,21 @@ class MedicationSerializer(serializers.ModelSerializer):
     def get_adherence(self, obj):
         return obj.adherence_rate()
 
+    def validate_name(self, value):
+        if not value.strip():
+            raise serializers.ValidationError("Name cannot be empty")
+        return value
+
+    def validate_dosage_mg(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("Dosage must be greater than 0")
+        return value
+
+    def validate_prescribed_per_day(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("Prescribed per day must be greater than 0")
+        return value
+
 
 class DoseLogSerializer(serializers.ModelSerializer):
     class Meta:
