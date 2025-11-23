@@ -10,12 +10,10 @@ from medtrackerapp.services import DrugInfoService
 
 class MedicationModelTests(TestCase):
 
-    # --- STR / REPR ---
     def test_str_returns_name_and_dosage(self):
         med = Medication.objects.create(name="Aspirin", dosage_mg=100, prescribed_per_day=2)
         self.assertEqual(str(med), "Aspirin (100mg)")
 
-    # --- VALIDATION ---
     def test_negative_dosage_validation(self):
         med = Medication(name="TestMed", dosage_mg=-5, prescribed_per_day=1)
         with self.assertRaises(ValidationError):
@@ -26,7 +24,6 @@ class MedicationModelTests(TestCase):
         with self.assertRaises(ValidationError):
             med.full_clean()
 
-    # --- EXPECTED DOSES ---
     def test_expected_doses_positive(self):
         med = Medication.objects.create(name="Aspirin", dosage_mg=100, prescribed_per_day=2)
         self.assertEqual(med.expected_doses(5), 10)
@@ -40,7 +37,6 @@ class MedicationModelTests(TestCase):
         with self.assertRaises(ValueError):
             med.expected_doses(-2)
 
-    # --- ADHERENCE RATE ---
     def test_adherence_rate_no_logs(self):
         med = Medication.objects.create(name="NoLogs", dosage_mg=10, prescribed_per_day=1)
         self.assertEqual(med.adherence_rate(), 0.0)
@@ -59,7 +55,6 @@ class MedicationModelTests(TestCase):
         DoseLog.objects.create(medication=med, taken_at=now - timedelta(hours=1), was_taken=False)
         self.assertEqual(med.adherence_rate(), 50.0)
 
-    # --- ADHERENCE RATE OVER PERIOD ---
     def test_adherence_rate_over_period_valid(self):
         med = Medication.objects.create(name="PeriodMed", dosage_mg=50, prescribed_per_day=1)
         today = date.today()
@@ -84,7 +79,6 @@ class MedicationModelTests(TestCase):
         with self.assertRaises(ValueError):
             med.adherence_rate_over_period(date(2025, 1, 5), date(2025, 1, 1))
 
-    # --- EXTERNAL INFO ---
     @patch("medtrackerapp.models.DrugInfoService.get_drug_info")
     def test_fetch_external_info_success(self, mock_service):
         med = Medication.objects.create(name="Paracetamol", dosage_mg=500, prescribed_per_day=2)

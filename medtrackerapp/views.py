@@ -50,14 +50,12 @@ class DoseLogViewSet(viewsets.ModelViewSet):
         start_param = request.query_params.get("start")
         end_param = request.query_params.get("end")
 
-        # Sprawdzenie obecności parametrów
         if not start_param or not end_param:
             return Response(
                 {"error": "Both 'start' and 'end' query parameters are required."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Parsowanie dat
         start = parse_date(start_param)
         end = parse_date(end_param)
         if not start or not end:
