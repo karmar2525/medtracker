@@ -31,6 +31,14 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Set database env variables
+        run: |
+          echo "DB_NAME=medtracker_db" >> $GITHUB_ENV
+          echo "DB_USER=Developer" >> $GITHUB_ENV
+          echo "DB_PASSWORD=test" >> $GITHUB_ENV
+          echo "DB_HOST=localhost" >> $GITHUB_ENV
+          echo "DB_PORT=5432" >> $GITHUB_ENV
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
@@ -50,13 +58,21 @@ jobs:
 
       - name: Apply migrations
         env:
-          DATABASE_URL: postgres://Developer:test@localhost:5432/medtracker_db
+          DB_NAME: medtracker_db
+          DB_USER: Developer
+          DB_PASSWORD: test
+          DB_HOST: localhost
+          DB_PORT: 5432
         run: |
           python manage.py migrate
 
       - name: Run tests
         env:
-          DATABASE_URL: postgres://Developer:test@localhost:5432/medtracker_db
+          DB_NAME: medtracker_db
+          DB_USER: Developer
+          DB_PASSWORD: test
+          DB_HOST: localhost
+          DB_PORT: 5432
         run: |
           python manage.py test medtrackerapp/tests
 
