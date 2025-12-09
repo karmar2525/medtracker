@@ -33,28 +33,33 @@ class MedicationViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["get"], url_path="expected-doses")
     def expected_doses(self, request, pk=None):
         """
-        Get the expected number of doses for this medication over a given number of days.
+        GET endpoint to retrieve the expected number of doses for a medication
+        over a given number of days.
 
-        Query parameter:
-            - days (int, required): number of days to calculate expected doses
+        Query parameters:
+            - days (int, required): number of days for the calculation
+
+        Returns:
+            - 200 OK: {medication_id, days, expected_doses}
+            - 400 Bad Request: if days is missing or invalid
         """
         medication = self.get_object()
         days_param = request.query_params.get("days")
 
-        # brak parametru days
-        if days_param is None:
+        if not days_param:
             return Response({"error": "Missing 'days' parameter"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             days = int(days_param)
             expected = medication.expected_doses(days)
-            return Response({
-                "medication_id": medication.id,
-                "days": days,
-                "expected_doses": expected
-            })
         except (ValueError, TypeError):
             return Response({"error": "Invalid 'days' parameter"}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            "medication_id": medication.id,
+            "days": days,
+            "expected_doses": expected
+        })
 
 
 class DoseLogViewSet(viewsets.ModelViewSet):
