@@ -5,13 +5,15 @@ from django.utils.dateparse import parse_date
 from .models import Medication, DoseLog
 from .serializers import MedicationSerializer, DoseLogSerializer
 
+
 class MedicationViewSet(viewsets.ModelViewSet):
     """
     API endpoint for viewing and managing medications.
 
     Provides standard CRUD operations via the Django REST Framework
-    `ModelViewSet`, as well as a custom action for retrieving
-    additional information from an external API (OpenFDA).
+    `ModelViewSet`, as well as custom actions:
+      - retrieving additional information from an external API (OpenFDA)
+      - getting expected doses over a given number of days
     """
     queryset = Medication.objects.all()
     serializer_class = MedicationSerializer
@@ -27,6 +29,32 @@ class MedicationViewSet(viewsets.ModelViewSet):
         if isinstance(data, dict) and data.get("error"):
             return Response(data, status=status.HTTP_502_BAD_GATEWAY)
         return Response(data)
+
+    @action(detail=True, methods=["get"], url_path="expected-doses")
+    def expected_doses(self, request, pk=None):
+        """
+        Get the expected number of doses for this medication over a given number of days.
+
+        Query parameter:
+            - days (int, required): number of days to calculate expected doses
+        """
+        medication = self.get_object()
+        days_param = request.query_params.get("days")
+
+        # brak parametru days
+        if days_param is None:
+            return Response({"error": "Missing 'days' parameter"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            days = int(days_param)
+            expected = medication.expected_doses(days)
+            return Response({
+                "medication_id": medication.id,
+                "days": days,
+                "expected_doses": expected
+            })
+        except (ValueError, TypeError):
+            return Response({"error": "Invalid 'days' parameter"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class DoseLogViewSet(viewsets.ModelViewSet):
