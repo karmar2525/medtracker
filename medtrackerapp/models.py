@@ -36,7 +36,7 @@ class Medication(models.Model):
             raise ValueError("Days must be non-negative.")
         if self.prescribed_per_day <= 0:
             return 0
-        return days * self.prescribed_per_day + 1
+        return days * self.prescribed_per_day
 
     def adherence_rate_over_period(self, start_date: _date, end_date: _date) -> float:
         if start_date > end_date:
