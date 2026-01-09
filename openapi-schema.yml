@@ -1,0 +1,508 @@
+openapi: 3.0.2
+info:
+  title: ''
+  version: ''
+paths:
+  /api/medications/:
+    get:
+      operationId: listMedications
+      description: "API endpoint for viewing and managing medications.\n\nProvides\
+        \ standard CRUD operations via ModelViewSet, as well as custom actions:\n\
+        \    - retrieving additional information from an external API (OpenFDA)\n\
+        \    - getting expected doses over a given number of days"
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Medication'
+          description: ''
+      tags:
+      - api
+    post:
+      operationId: createMedication
+      description: "API endpoint for viewing and managing medications.\n\nProvides\
+        \ standard CRUD operations via ModelViewSet, as well as custom actions:\n\
+        \    - retrieving additional information from an external API (OpenFDA)\n\
+        \    - getting expected doses over a given number of days"
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Medication'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Medication'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Medication'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Medication'
+          description: ''
+      tags:
+      - api
+  /api/medications/{id}/:
+    get:
+      operationId: retrieveMedication
+      description: "API endpoint for viewing and managing medications.\n\nProvides\
+        \ standard CRUD operations via ModelViewSet, as well as custom actions:\n\
+        \    - retrieving additional information from an external API (OpenFDA)\n\
+        \    - getting expected doses over a given number of days"
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this medication.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Medication'
+          description: ''
+      tags:
+      - api
+    put:
+      operationId: updateMedication
+      description: "API endpoint for viewing and managing medications.\n\nProvides\
+        \ standard CRUD operations via ModelViewSet, as well as custom actions:\n\
+        \    - retrieving additional information from an external API (OpenFDA)\n\
+        \    - getting expected doses over a given number of days"
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this medication.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Medication'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Medication'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Medication'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Medication'
+          description: ''
+      tags:
+      - api
+    patch:
+      operationId: partialUpdateMedication
+      description: "API endpoint for viewing and managing medications.\n\nProvides\
+        \ standard CRUD operations via ModelViewSet, as well as custom actions:\n\
+        \    - retrieving additional information from an external API (OpenFDA)\n\
+        \    - getting expected doses over a given number of days"
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this medication.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Medication'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Medication'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Medication'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Medication'
+          description: ''
+      tags:
+      - api
+    delete:
+      operationId: destroyMedication
+      description: "API endpoint for viewing and managing medications.\n\nProvides\
+        \ standard CRUD operations via ModelViewSet, as well as custom actions:\n\
+        \    - retrieving additional information from an external API (OpenFDA)\n\
+        \    - getting expected doses over a given number of days"
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this medication.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
+      tags:
+      - api
+  /api/medications/{id}/expected-doses/:
+    get:
+      operationId: expectedDosesMedication
+      description: "GET endpoint: retrieve expected number of doses for a medication\
+        \ over a number of days.\n\nQuery parameters:\n    - days (int, required):\
+        \ number of days for the calculation"
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this medication.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Medication'
+          description: ''
+      tags:
+      - api
+  /api/medications/{id}/info/:
+    get:
+      operationId: getExternalInfoMedication
+      description: 'GET endpoint: retrieve external drug information from the OpenFDA
+        API.
+
+        Returns 502 if the API call fails.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this medication.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Medication'
+          description: ''
+      tags:
+      - api
+  /api/logs/:
+    get:
+      operationId: listDoseLogs
+      description: 'API endpoint for viewing and managing dose logs.
+
+
+        Provides CRUD operations and filtering by date range.'
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DoseLog'
+          description: ''
+      tags:
+      - api
+    post:
+      operationId: createDoseLog
+      description: 'API endpoint for viewing and managing dose logs.
+
+
+        Provides CRUD operations and filtering by date range.'
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DoseLog'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DoseLog'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DoseLog'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoseLog'
+          description: ''
+      tags:
+      - api
+  /api/logs/filter/:
+    get:
+      operationId: filterByDateDoseLog
+      description: "GET endpoint: retrieve dose logs within a specified date range.\n\
+        \nQuery parameters:\n    - start (YYYY-MM-DD): start date (inclusive)\n  \
+        \  - end (YYYY-MM-DD): end date (inclusive)\n\nReturns 400 if parameters are\
+        \ missing or invalid."
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoseLog'
+          description: ''
+      tags:
+      - api
+  /api/logs/{id}/:
+    get:
+      operationId: retrieveDoseLog
+      description: 'API endpoint for viewing and managing dose logs.
+
+
+        Provides CRUD operations and filtering by date range.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this dose log.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoseLog'
+          description: ''
+      tags:
+      - api
+    put:
+      operationId: updateDoseLog
+      description: 'API endpoint for viewing and managing dose logs.
+
+
+        Provides CRUD operations and filtering by date range.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this dose log.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DoseLog'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DoseLog'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DoseLog'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoseLog'
+          description: ''
+      tags:
+      - api
+    patch:
+      operationId: partialUpdateDoseLog
+      description: 'API endpoint for viewing and managing dose logs.
+
+
+        Provides CRUD operations and filtering by date range.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this dose log.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DoseLog'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DoseLog'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DoseLog'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoseLog'
+          description: ''
+      tags:
+      - api
+    delete:
+      operationId: destroyDoseLog
+      description: 'API endpoint for viewing and managing dose logs.
+
+
+        Provides CRUD operations and filtering by date range.'
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this dose log.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
+      tags:
+      - api
+  /api/notes/:
+    get:
+      operationId: listNotes
+      description: API endpoint for managing doctor's notes associated with medications.
+      parameters: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Note'
+          description: ''
+      tags:
+      - api
+    post:
+      operationId: createNote
+      description: API endpoint for managing doctor's notes associated with medications.
+      parameters: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Note'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Note'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Note'
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+          description: ''
+      tags:
+      - api
+  /api/notes/{id}/:
+    get:
+      operationId: retrieveNote
+      description: API endpoint for managing doctor's notes associated with medications.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this note.
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+          description: ''
+      tags:
+      - api
+    delete:
+      operationId: destroyNote
+      description: API endpoint for managing doctor's notes associated with medications.
+      parameters:
+      - name: id
+        in: path
+        required: true
+        description: A unique integer value identifying this note.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: ''
+      tags:
+      - api
+components:
+  schemas:
+    Medication:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 100
+        dosage_mg:
+          type: integer
+          maximum: 2147483647
+          minimum: 0
+        prescribed_per_day:
+          type: integer
+          maximum: 2147483647
+          description: Expected number of doses per day
+          minimum: 0
+        adherence:
+          type: string
+          readOnly: true
+      required:
+      - name
+      - dosage_mg
+      - prescribed_per_day
+    DoseLog:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        medication:
+          type: integer
+        taken_at:
+          type: string
+          format: date-time
+        was_taken:
+          type: boolean
+      required:
+      - medication
+      - taken_at
+    Note:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        medication:
+          type: integer
+        text:
+          type: string
+        created_at:
+          type: string
+          format: date
+          readOnly: true
+      required:
+      - medication
+      - text
