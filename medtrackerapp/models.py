@@ -5,6 +5,7 @@ from .services import DrugInfoService
 from django.test import TestCase
 from datetime import datetime, date, timedelta
 
+
 class Medication(models.Model):
     """
     Represents a prescribed medication with dosage and daily schedule.
@@ -77,7 +78,6 @@ class DoseLog(models.Model):
         status = "Taken" if self.was_taken else "Missed"
         when = timezone.localtime(self.taken_at).strftime("%Y-%m-%d %H:%M")
         return f"{self.medication.name} at {when} - {status}"
-
 
 
 class MedicationModelTests(TestCase):
