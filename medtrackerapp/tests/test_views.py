@@ -9,130 +9,165 @@ from datetime import date, timedelta
 
 
 class MedicationAPITests(TestCase):
-
     def setUp(self):
         self.client = APIClient()
         self.valid_data = {"name": "Aspirin", "dosage_mg": 100, "prescribed_per_day": 2}
 
     def test_get_medications(self):
         Medication.objects.create(**self.valid_data)
-        response = self.client.get(reverse('medication-list'))
+        response = self.client.get(reverse("medication-list"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
     def test_get_single_medication(self):
         med = Medication.objects.create(**self.valid_data)
-        response = self.client.get(reverse('medication-detail', args=[med.id]))
+        response = self.client.get(reverse("medication-detail", args=[med.id]))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_invalid_medication(self):
-        response = self.client.get(reverse('medication-detail', args=[999]))
+        response = self.client.get(reverse("medication-detail", args=[999]))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_post_valid_medication(self):
-        response = self.client.post(reverse('medication-list'), self.valid_data, format='json')
+        response = self.client.post(
+            reverse("medication-list"), self.valid_data, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_post_invalid_medication_empty(self):
-        response = self.client.post(reverse('medication-list'), {}, format='json')
+        response = self.client.post(reverse("medication-list"), {}, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_post_negative_dosage(self):
         data = {"name": "BadMed", "dosage_mg": -10, "prescribed_per_day": 2}
-        response = self.client.post(reverse('medication-list'), data, format='json')
+        response = self.client.post(reverse("medication-list"), data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_post_negative_prescribed_per_day(self):
         data = {"name": "BadMed", "dosage_mg": 10, "prescribed_per_day": -2}
-        response = self.client.post(reverse('medication-list'), data, format='json')
+        response = self.client.post(reverse("medication-list"), data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_post_zero_prescribed_per_day(self):
         data = {"name": "ZeroMed", "dosage_mg": 10, "prescribed_per_day": 0}
-        response = self.client.post(reverse('medication-list'), data, format='json')
+        response = self.client.post(reverse("medication-list"), data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_post_empty_name(self):
         data = {"name": "", "dosage_mg": 10, "prescribed_per_day": 1}
-        response = self.client.post(reverse('medication-list'), data, format='json')
+        response = self.client.post(reverse("medication-list"), data, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_medication(self):
         med = Medication.objects.create(**self.valid_data)
-        updated_data = {"name": "AspirinUpdated", "dosage_mg": 200, "prescribed_per_day": 1}
-        response = self.client.put(reverse('medication-detail', args=[med.id]), updated_data, format='json')
+        updated_data = {
+            "name": "AspirinUpdated",
+            "dosage_mg": 200,
+            "prescribed_per_day": 1,
+        }
+        response = self.client.put(
+            reverse("medication-detail", args=[med.id]), updated_data, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         med.refresh_from_db()
         self.assertEqual(med.name, "AspirinUpdated")
 
     def test_update_invalid_medication(self):
         updated_data = {"name": "Invalid", "dosage_mg": 50, "prescribed_per_day": 1}
-        response = self.client.put(reverse('medication-detail', args=[999]), updated_data, format='json')
+        response = self.client.put(
+            reverse("medication-detail", args=[999]), updated_data, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_medication(self):
         med = Medication.objects.create(**self.valid_data)
-        response = self.client.delete(reverse('medication-detail', args=[med.id]))
+        response = self.client.delete(reverse("medication-detail", args=[med.id]))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Medication.objects.count(), 0)
 
     def test_delete_invalid_medication(self):
-        response = self.client.delete(reverse('medication-detail', args=[999]))
+        response = self.client.delete(reverse("medication-detail", args=[999]))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class DoseLogAPITests(TestCase):
-
     def setUp(self):
         self.client = APIClient()
-        self.med = Medication.objects.create(name="Ibuprofen", dosage_mg=200, prescribed_per_day=2)
+        self.med = Medication.objects.create(
+            name="Ibuprofen", dosage_mg=200, prescribed_per_day=2
+        )
 
     def test_get_logs(self):
-        DoseLog.objects.create(medication=self.med, taken_at=timezone.now(), was_taken=True)
-        response = self.client.get(reverse('doselog-list'))
+        DoseLog.objects.create(
+            medication=self.med, taken_at=timezone.now(), was_taken=True
+        )
+        response = self.client.get(reverse("doselog-list"))
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
 
     def test_get_invalid_log(self):
-        response = self.client.get(reverse('doselog-detail', args=[999]))
+        response = self.client.get(reverse("doselog-detail", args=[999]))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_post_valid_log(self):
-        data = {"medication": self.med.id, "taken_at": timezone.now(), "was_taken": True}
-        response = self.client.post(reverse('doselog-list'), data, format='json')
+        data = {
+            "medication": self.med.id,
+            "taken_at": timezone.now(),
+            "was_taken": True,
+        }
+        response = self.client.post(reverse("doselog-list"), data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_post_invalid_log_empty(self):
-        response = self.client.post(reverse('doselog-list'), {}, format='json')
+        response = self.client.post(reverse("doselog-list"), {}, format="json")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_update_log(self):
-        log = DoseLog.objects.create(medication=self.med, taken_at=timezone.now(), was_taken=True)
-        new_data = {"medication": self.med.id, "taken_at": timezone.now(), "was_taken": False}
-        response = self.client.put(reverse('doselog-detail', args=[log.id]), new_data, format='json')
+        log = DoseLog.objects.create(
+            medication=self.med, taken_at=timezone.now(), was_taken=True
+        )
+        new_data = {
+            "medication": self.med.id,
+            "taken_at": timezone.now(),
+            "was_taken": False,
+        }
+        response = self.client.put(
+            reverse("doselog-detail", args=[log.id]), new_data, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         log.refresh_from_db()
         self.assertFalse(log.was_taken)
 
     def test_update_invalid_log(self):
-        new_data = {"medication": self.med.id, "taken_at": timezone.now(), "was_taken": False}
-        response = self.client.put(reverse('doselog-detail', args=[999]), new_data, format='json')
+        new_data = {
+            "medication": self.med.id,
+            "taken_at": timezone.now(),
+            "was_taken": False,
+        }
+        response = self.client.put(
+            reverse("doselog-detail", args=[999]), new_data, format="json"
+        )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_delete_log(self):
-        log = DoseLog.objects.create(medication=self.med, taken_at=timezone.now(), was_taken=True)
-        response = self.client.delete(reverse('doselog-detail', args=[log.id]))
+        log = DoseLog.objects.create(
+            medication=self.med, taken_at=timezone.now(), was_taken=True
+        )
+        response = self.client.delete(reverse("doselog-detail", args=[log.id]))
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(DoseLog.objects.count(), 0)
 
     def test_delete_invalid_log(self):
-        response = self.client.delete(reverse('doselog-detail', args=[999]))
+        response = self.client.delete(reverse("doselog-detail", args=[999]))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
 
 class MedicationExternalInfoTests(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.med = Medication.objects.create(name="Paracetamol", dosage_mg=500, prescribed_per_day=2)
+        self.med = Medication.objects.create(
+            name="Paracetamol", dosage_mg=500, prescribed_per_day=2
+        )
 
     @patch("medtrackerapp.models.Medication.fetch_external_info")
     def test_get_external_info_success(self, mock_fetch):
@@ -154,10 +189,14 @@ class MedicationExternalInfoTests(TestCase):
 class DoseLogFilterTests(TestCase):
     def setUp(self):
         self.client = APIClient()
-        self.med = Medication.objects.create(name="Ibuprofen", dosage_mg=200, prescribed_per_day=2)
+        self.med = Medication.objects.create(
+            name="Ibuprofen", dosage_mg=200, prescribed_per_day=2
+        )
         now = timezone.now()
         DoseLog.objects.create(medication=self.med, taken_at=now, was_taken=True)
-        DoseLog.objects.create(medication=self.med, taken_at=now - timedelta(days=1), was_taken=False)
+        DoseLog.objects.create(
+            medication=self.med, taken_at=now - timedelta(days=1), was_taken=False
+        )
 
     def test_filter_logs_valid_range(self):
         start = (date.today() - timedelta(days=1)).isoformat()

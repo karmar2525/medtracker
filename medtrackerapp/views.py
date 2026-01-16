@@ -6,6 +6,7 @@ from .models import Medication, DoseLog, Note
 from .serializers import MedicationSerializer, DoseLogSerializer, NoteSerializer
 from rest_framework.filters import SearchFilter
 
+
 class MedicationViewSet(viewsets.ModelViewSet):
     """
     API endpoint for viewing and managing medications.
@@ -14,6 +15,7 @@ class MedicationViewSet(viewsets.ModelViewSet):
         - retrieving additional information from an external API (OpenFDA)
         - getting expected doses over a given number of days
     """
+
     queryset = Medication.objects.all()
     serializer_class = MedicationSerializer
 
@@ -46,19 +48,23 @@ class MedicationViewSet(viewsets.ModelViewSet):
         days_param = request.query_params.get("days")
 
         if not days_param:
-            return Response({"error": "Missing 'days' parameter"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Missing 'days' parameter"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         try:
             days = int(days_param)
             expected = medication.expected_doses(days)
         except (ValueError, TypeError):
-            return Response({"error": "Invalid 'days' parameter"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Invalid 'days' parameter"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-        return Response({
-            "medication_id": medication.id,
-            "days": days,
-            "expected_doses": expected
-        })
+        return Response(
+            {"medication_id": medication.id, "days": days, "expected_doses": expected}
+        )
 
 
 class DoseLogViewSet(viewsets.ModelViewSet):
@@ -67,6 +73,7 @@ class DoseLogViewSet(viewsets.ModelViewSet):
 
     Provides CRUD operations and filtering by date range.
     """
+
     queryset = DoseLog.objects.all()
     serializer_class = DoseLogSerializer
 
@@ -87,21 +94,24 @@ class DoseLogViewSet(viewsets.ModelViewSet):
         if not start_param or not end_param:
             return Response(
                 {"error": "Both 'start' and 'end' query parameters are required."},
-                status=status.HTTP_400_BAD_REQUEST
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         start = parse_date(start_param)
         end = parse_date(end_param)
         if not start or not end:
             return Response(
-                {"error": "Both 'start' and 'end' must be valid dates in YYYY-MM-DD format."},
-                status=status.HTTP_400_BAD_REQUEST
+                {
+                    "error": "Both 'start' and 'end' must be valid dates in YYYY-MM-DD format."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
-        logs = self.get_queryset().filter(
-            taken_at__date__gte=start,
-            taken_at__date__lte=end
-        ).order_by("taken_at")
+        logs = (
+            self.get_queryset()
+            .filter(taken_at__date__gte=start, taken_at__date__lte=end)
+            .order_by("taken_at")
+        )
 
         serializer = self.get_serializer(logs, many=True)
         return Response(serializer.data)
@@ -112,8 +122,7 @@ class NoteViewSet(
     mixins.RetrieveModelMixin,
     mixins.DestroyModelMixin,
     mixins.ListModelMixin,
-    viewsets.GenericViewSet
-
+    viewsets.GenericViewSet,
 ):
     """
     API endpoint for managing doctor's notes associated with medications.
@@ -125,8 +134,9 @@ class NoteViewSet(
         - Delete
     Updating notes is NOT allowed.
     """
+
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
 
     filter_backends = (SearchFilter,)
-    search_fields = ['medication__name']
+    search_fields = ["medication__name"]

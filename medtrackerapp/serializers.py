@@ -8,6 +8,7 @@ class MedicationSerializer(serializers.ModelSerializer):
 
     Adds an 'adherence' field computed from the related DoseLog entries.
     """
+
     adherence = serializers.SerializerMethodField()
 
     class Meta:
@@ -41,7 +42,9 @@ class MedicationSerializer(serializers.ModelSerializer):
         Ensure prescribed_per_day is greater than zero.
         """
         if value <= 0:
-            raise serializers.ValidationError("Prescribed per day must be greater than 0")
+            raise serializers.ValidationError(
+                "Prescribed per day must be greater than 0"
+            )
         return value
 
 
@@ -50,6 +53,7 @@ class DoseLogSerializer(serializers.ModelSerializer):
     Serializer for the DoseLog model.
     Records whether a medication dose was taken at a specific time.
     """
+
     class Meta:
         model = DoseLog
         fields = ["id", "medication", "taken_at", "was_taken"]
@@ -62,6 +66,7 @@ class NoteSerializer(serializers.ModelSerializer):
     Allows creation, retrieval, and listing of doctor's notes associated with medications.
     'created_at' is read-only.
     """
+
     class Meta:
         model = Note
         fields = ["id", "medication", "text", "created_at"]
