@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from django.utils.dateparse import parse_date
 from .models import Medication, DoseLog, Note
 from .serializers import MedicationSerializer, DoseLogSerializer, NoteSerializer
+from rest_framework.filters import SearchFilter
 
 class MedicationViewSet(viewsets.ModelViewSet):
     """
@@ -112,6 +113,7 @@ class NoteViewSet(
     mixins.DestroyModelMixin,
     mixins.ListModelMixin,
     viewsets.GenericViewSet
+
 ):
     """
     API endpoint for managing doctor's notes associated with medications.
@@ -125,3 +127,6 @@ class NoteViewSet(
     """
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
+
+    filter_backends = (SearchFilter,)
+    search_fields = ['medication__name']
