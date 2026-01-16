@@ -1,9 +1,7 @@
-name: Ruff Linting Check
+name: Ruff linting
 
 on:
   push:
-    branches:
-      - '**'
 
 jobs:
   ruff:
@@ -16,20 +14,21 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.13.1
+          python-version: 3.13
 
       - name: Install dependencies
         run: |
-          python -m venv venv
-          source venv/bin/activate
+          python -m venv .venv
+          source .venv/bin/activate
+          pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Ruff Lint Check
+      - name: Ruff lint check
         run: |
-          source venv/bin/activate
+          source .venv/bin/activate
           ruff check . --show-fixes --output-format=github
 
-      - name: Ruff Format Check
+      - name: Ruff format check
         run: |
-          source venv/bin/activate
+          source .venv/bin/activate
           ruff format --check --diff .
