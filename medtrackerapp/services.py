@@ -1,5 +1,6 @@
 import requests
 
+
 class DrugInfoService:
     """
     Wrapper around the OpenFDA Drug Label API.
@@ -32,8 +33,12 @@ class DrugInfoService:
         purpose = record.get("purpose")
 
         return {
-            "name": generic_name[0] if isinstance(generic_name, list) and generic_name else drug_name,
-            "manufacturer": manufacturer[0] if isinstance(manufacturer, list) and manufacturer else "Unknown",
+            "name": generic_name[0]
+            if isinstance(generic_name, list) and generic_name
+            else drug_name,
+            "manufacturer": manufacturer[0]
+            if isinstance(manufacturer, list) and manufacturer
+            else "Unknown",
             "warnings": warnings if warnings else ["No warnings available"],
             "purpose": purpose if purpose else ["Not specified"],
         }

@@ -3,21 +3,16 @@ from rest_framework import status
 from django.urls import reverse
 from medtrackerapp.models import Medication
 
-class NotesTests(APITestCase):
 
+class NotesTests(APITestCase):
     def setUp(self):
         self.med = Medication.objects.create(
-            name="Ibuprofen",
-            dosage_mg=200,
-            prescribed_per_day=2
+            name="Ibuprofen", dosage_mg=200, prescribed_per_day=2
         )
         self.notes_url = reverse("note-list")
 
     def test_create_note(self):
-        data = {
-            "medication": self.med.id,
-            "text": "Patient reported mild headache."
-        }
+        data = {"medication": self.med.id, "text": "Patient reported mild headache."}
         response = self.client.post(self.notes_url, data, format="json")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertIn("id", response.data)
@@ -27,10 +22,11 @@ class NotesTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_single_note(self):
-        create = self.client.post(self.notes_url, {
-            "medication": self.med.id,
-            "text": "Test note"
-        }, format="json")
+        create = self.client.post(
+            self.notes_url,
+            {"medication": self.med.id, "text": "Test note"},
+            format="json",
+        )
         note_id = create.data["id"]
 
         url = reverse("note-detail", args=[note_id])
@@ -40,10 +36,11 @@ class NotesTests(APITestCase):
         self.assertEqual(response.data["id"], note_id)
 
     def test_delete_note(self):
-        create = self.client.post(self.notes_url, {
-            "medication": self.med.id,
-            "text": "Note to delete"
-        }, format="json")
+        create = self.client.post(
+            self.notes_url,
+            {"medication": self.med.id, "text": "Note to delete"},
+            format="json",
+        )
         note_id = create.data["id"]
 
         url = reverse("note-detail", args=[note_id])
@@ -52,10 +49,11 @@ class NotesTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_update_not_allowed(self):
-        create = self.client.post(self.notes_url, {
-            "medication": self.med.id,
-            "text": "Original text"
-        }, format="json")
+        create = self.client.post(
+            self.notes_url,
+            {"medication": self.med.id, "text": "Original text"},
+            format="json",
+        )
         note_id = create.data["id"]
 
         url = reverse("note-detail", args=[note_id])

@@ -2,6 +2,8 @@ from django.db import models
 from datetime import date as _date
 from django.utils import timezone
 from .services import DrugInfoService
+from django.test import TestCase
+from datetime import datetime, date, timedelta
 
 
 class Medication(models.Model):
@@ -13,7 +15,9 @@ class Medication(models.Model):
 
     name = models.CharField(max_length=100)
     dosage_mg = models.PositiveIntegerField()
-    prescribed_per_day = models.PositiveIntegerField(help_text="Expected number of doses per day")
+    prescribed_per_day = models.PositiveIntegerField(
+        help_text="Expected number of doses per day"
+    )
 
     def __str__(self):
         return f"{self.name} ({self.dosage_mg}mg)"
@@ -42,8 +46,7 @@ class Medication(models.Model):
         if start_date > end_date:
             raise ValueError("start_date must be before or equal to end_date")
         logs = self.doselog_set.filter(
-            taken_at__date__gte=start_date,
-            taken_at__date__lte=end_date
+            taken_at__date__gte=start_date, taken_at__date__lte=end_date
         )
         days = (end_date - start_date).days + 1
         expected = self.expected_doses(days)
@@ -76,18 +79,12 @@ class DoseLog(models.Model):
         when = timezone.localtime(self.taken_at).strftime("%Y-%m-%d %H:%M")
         return f"{self.medication.name} at {when} - {status}"
 
-from django.test import TestCase
-from datetime import datetime, date, timedelta
-from medtrackerapp.models import Medication, DoseLog
 
 class MedicationModelTests(TestCase):
-
     def setUp(self):
         # Create a sample medication
         self.med = Medication.objects.create(
-            name="Ibuprofen",
-            dosage_mg=200,
-            prescribed_per_day=2
+            name="Ibuprofen", dosage_mg=200, prescribed_per_day=2
         )
 
     # --- POSITIVE TESTS ---
@@ -106,10 +103,16 @@ class MedicationModelTests(TestCase):
 
     def test_adherence_rate_with_logs(self):
         """Test adherence rate with some taken and some missed doses"""
-        DoseLog.objects.create(medication=self.med, taken_at=datetime.now(), was_taken=True)
-        DoseLog.objects.create(medication=self.med, taken_at=datetime.now(), was_taken=True)
-        DoseLog.objects.create(medication=self.med, taken_at=datetime.now(), was_taken=False)
-        self.assertEqual(self.med.adherence_rate(), round(2/3*100, 2))
+        DoseLog.objects.create(
+            medication=self.med, taken_at=datetime.now(), was_taken=True
+        )
+        DoseLog.objects.create(
+            medication=self.med, taken_at=datetime.now(), was_taken=True
+        )
+        DoseLog.objects.create(
+            medication=self.med, taken_at=datetime.now(), was_taken=False
+        )
+        self.assertEqual(self.med.adherence_rate(), round(2 / 3 * 100, 2))
 
     def test_adherence_rate_over_period(self):
         """Test adherence rate over a specific period"""
@@ -117,11 +120,13 @@ class MedicationModelTests(TestCase):
         DoseLog.objects.create(
             medication=self.med,
             taken_at=datetime.combine(today, datetime.min.time()),
-            was_taken=True
+            was_taken=True,
         )
         # Expected adherence = taken doses / expected doses * 100
         expected = (1 / self.med.prescribed_per_day) * 100
-        self.assertEqual(self.med.adherence_rate_over_period(today, today), round(expected, 2))
+        self.assertEqual(
+            self.med.adherence_rate_over_period(today, today), round(expected, 2)
+        )
 
     # --- NEGATIVE TESTS ---
 
@@ -153,8 +158,11 @@ class MedicationModelTests(TestCase):
         with self.assertRaises(Exception):
             DoseLog.objects.create(medication=self.med)
 
+
 class Note(models.Model):
-    medication = models.ForeignKey(Medication, on_delete=models.CASCADE, related_name="notes")
+    medication = models.ForeignKey(
+        Medication, on_delete=models.CASCADE, related_name="notes"
+    )
     text = models.TextField()
     created_at = models.DateField(auto_now_add=True)
 

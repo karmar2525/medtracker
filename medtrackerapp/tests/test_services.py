@@ -3,16 +3,16 @@ from django.test import TestCase
 from medtrackerapp.services import DrugInfoService
 import requests
 
-class DrugInfoServiceTests(TestCase):
 
-    @patch('medtrackerapp.services.requests.get')
+class DrugInfoServiceTests(TestCase):
+    @patch("medtrackerapp.services.requests.get")
     def test_get_drug_info_timeout(self, mock_get):
         """Simulate a network timeout"""
         mock_get.side_effect = requests.exceptions.Timeout
         with self.assertRaises(requests.exceptions.Timeout):
             DrugInfoService.get_drug_info("Paracetamol")
 
-    @patch('medtrackerapp.services.requests.get')
+    @patch("medtrackerapp.services.requests.get")
     def test_get_drug_info_invalid_json(self, mock_get):
         """Simulate invalid JSON from API"""
         mock_get.return_value.status_code = 200
@@ -20,7 +20,7 @@ class DrugInfoServiceTests(TestCase):
         with self.assertRaises(ValueError):
             DrugInfoService.get_drug_info("Paracetamol")
 
-    @patch('medtrackerapp.services.requests.get')
+    @patch("medtrackerapp.services.requests.get")
     def test_get_drug_info_success(self, mock_get):
         """Test API returns valid data successfully"""
         mock_get.return_value.status_code = 200
@@ -30,10 +30,10 @@ class DrugInfoServiceTests(TestCase):
                     "openfda": {
                         "brand_name": ["Paracetamol"],
                         "manufacturer_name": ["Test Pharma"],
-                        "generic_name": ["Paracetamol"]
+                        "generic_name": ["Paracetamol"],
                     },
                     "warnings": ["Do not exceed recommended dose"],
-                    "purpose": ["Pain relief"]
+                    "purpose": ["Pain relief"],
                 }
             ]
         }
@@ -45,7 +45,7 @@ class DrugInfoServiceTests(TestCase):
         self.assertIn("Do not exceed recommended dose", result["warnings"])
         self.assertIn("Pain relief", result["purpose"])
 
-    @patch('medtrackerapp.services.requests.get')
+    @patch("medtrackerapp.services.requests.get")
     def test_get_drug_info_no_results(self, mock_get):
         """Test API returns no results"""
         mock_get.return_value.status_code = 200
@@ -54,7 +54,7 @@ class DrugInfoServiceTests(TestCase):
         with self.assertRaises(ValueError):
             DrugInfoService.get_drug_info("UnknownDrug")
 
-    @patch('medtrackerapp.services.requests.get')
+    @patch("medtrackerapp.services.requests.get")
     def test_get_drug_info_api_error(self, mock_get):
         """Test API returns error status"""
         mock_get.return_value.status_code = 500
@@ -62,13 +62,11 @@ class DrugInfoServiceTests(TestCase):
         with self.assertRaises(ValueError):
             DrugInfoService.get_drug_info("ErrorDrug")
 
-    @patch('medtrackerapp.services.requests.get')
+    @patch("medtrackerapp.services.requests.get")
     def test_get_drug_info_empty_fields(self, mock_get):
         """Test API returns results with empty/missing fields"""
         mock_get.return_value.status_code = 200
-        mock_get.return_value.json.return_value = {
-            "results": [{}]
-        }
+        mock_get.return_value.json.return_value = {"results": [{}]}
 
         result = DrugInfoService.get_drug_info("UnknownDrug")
 
@@ -77,7 +75,7 @@ class DrugInfoServiceTests(TestCase):
         self.assertEqual(result["warnings"], ["No warnings available"])
         self.assertEqual(result["purpose"], ["Not specified"])
 
-    @patch('medtrackerapp.services.requests.get')
+    @patch("medtrackerapp.services.requests.get")
     def test_get_drug_info_partial_fields(self, mock_get):
         """Test API returns some missing fields"""
         mock_get.return_value.status_code = 200
@@ -86,7 +84,7 @@ class DrugInfoServiceTests(TestCase):
                 {
                     "openfda": {"generic_name": ["TestDrug"]},
                     "warnings": [],
-                    "purpose": ["Pain relief"]
+                    "purpose": ["Pain relief"],
                 }
             ]
         }
